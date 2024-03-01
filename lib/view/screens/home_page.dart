@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_analog_clock/flutter_analog_clock.dart';
+import 'package:slide_digital_clock/slide_digital_clock.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -51,7 +53,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Colors.black87,
         foregroundColor: Colors.white60,
-        title: const Text("Clock page"),
+        title: const Text("Clock app"),
       ),
       drawer: Drawer(
         child: Column(
@@ -163,7 +165,8 @@ class _HomePageState extends State<HomePage> {
               image: _isImage
                   ? NetworkImage(bgImage)
                   : const NetworkImage(
-                      "https://i.pinimg.com/1200x/84/2a/d6/842ad68b315b0f586c30b465221da609.jpg"),
+                      "https://i.pinimg.com/1200x/84/2a/d6/842ad68b315b0f586c30b465221da609.jpg",
+                    ),
               fit: BoxFit.fill),
         ),
         padding: const EdgeInsets.all(16),
@@ -174,106 +177,31 @@ class _HomePageState extends State<HomePage> {
             // AnalogWatch
             Visibility(
               visible: _isAnalog,
-              child: Stack(
+              child: const Stack(
                 alignment: Alignment.center,
                 children: [
-                  //allPoint
-                  ...List.generate(
-                    60,
-                    (index) => Transform.rotate(
-                      angle: index * (pi * 2) / 60,
-                      child: Divider(
-                        endIndent: index % 5 == 0
-                            ? size.width * 0.88
-                            : size.width * 0.9,
-                        thickness: 2,
-                        color: index % 5 == 0 ? Colors.red : Colors.grey,
-                      ),
-                    ),
-                  ),
-                  // To add number
-                  // ...List.generate(
-                  //   60,
-                  //   (index) => Transform.rotate(
-                  //     angle: index * (pi * 2) / 60,
-                  //     child: Text(
-                  //       "${index % 5 == 0 ? index : ""}",
-                  //       style: TextStyle(
-                  //         fontSize: 30,
-                  //         color: index % 5 == 0 ? Colors.red : Colors.grey,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  //hourHand
-                  Transform.rotate(
-                    angle: pi / 2,
-                    child: Transform.rotate(
-                      angle: d.hour * (pi * 2) / 12,
-                      child: Divider(
-                        indent: 50,
-                        endIndent: size.width * 0.5 - 16,
-                        color: Colors.black,
-                        thickness: 4,
-                      ),
-                    ),
-                  ),
-                  //minuteHand
-                  Transform.rotate(
-                    angle: pi / 2,
-                    child: Transform.rotate(
-                      angle: d.minute * (pi * 2) / 60,
-                      child: Divider(
-                        indent: 30,
-                        endIndent: size.width * 0.5 - 16,
-                        color: Colors.black,
-                        thickness: 2,
-                      ),
-                    ),
-                  ),
-                  //secondHand
-                  Transform.rotate(
-                    angle: pi / 2,
-                    child: Transform.rotate(
-                      angle: d.second * (pi * 2) / 60,
-                      child: Divider(
-                        indent: 20,
-                        endIndent: size.width * 0.5 - 16,
-                        color: Colors.red,
-                        thickness: 2,
-                      ),
-                    ),
-                  ),
-                  const CircleAvatar(
-                    radius: 8,
-                    backgroundColor: Colors.red,
+                  AnalogClock(
+                    markingRadiusFactor: 0,
+                    hourNumberRadiusFactor: 1,
+                    hourHandLengthFactor: 0.85,
+                    minuteHandLengthFactor: 0.9,
+                    secondHandLengthFactor: 0.8,
                   ),
                 ],
               ),
             ),
+            // Digital
             Visibility(
               visible: _isDigital,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "${d.hour} : ${d.minute} : ${d.second}",
-                    style: const TextStyle(fontSize: 50),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Day: ${d.day}",
-                        style: TextStyle(fontSize: 30),
-                      ),
-                      Text(
-                        "Week day: ${d.weekday}",
-                        style: TextStyle(fontSize: 30),
-                      ),
-                    ],
-                  )
-                ],
+              child: Transform.scale(
+                scale: 5,
+                child: DigitalClock(
+                  is24HourTimeFormat: true,
+                  secondDigitTextStyle:
+                      const TextStyle(fontSize: 10, color: Colors.red),
+                  hourMinuteDigitTextStyle:
+                      const TextStyle(fontSize: 14, color: Colors.red),
+                ),
               ),
             ),
             // StrapWatch
@@ -285,7 +213,7 @@ class _HomePageState extends State<HomePage> {
                   Transform.scale(
                     scale: 7,
                     child: CircularProgressIndicator(
-                      value: (d.hour / 12).toDouble(),
+                      value: (d.hour / 24).toDouble(),
                       strokeWidth: 1.7,
                     ),
                   ),
