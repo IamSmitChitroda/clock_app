@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_analog_clock/flutter_analog_clock.dart';
@@ -31,6 +32,56 @@ class _HomePageState extends State<HomePage> {
   bool _isStrap = false;
   bool _isImage = false;
   bool _isDigital = false;
+  bool _isStopwatch = false;
+
+  int sec = 0;
+  int min = 0;
+  int hou = 0;
+  String sSec = "00";
+  String sMin = "00";
+  String sHou = "00";
+  Timer? timer;
+  bool started = false;
+  List laps = [];
+
+  void start() {
+    started = true;
+
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      sec++;
+      if (sec > 59) {
+        if (min > 59) {
+          hou++;
+          min = 0;
+        } else {
+          min++;
+          sec = 0;
+        }
+      }
+      setState(() {
+        min = min;
+        hou = hou;
+
+        sSec = (sec >= 10) ? "$sec" : "0$sec";
+        sHou = (sec >= 10) ? "$hou" : "0$hou";
+        sMin = (min >= 10) ? "$min" : "0$min";
+      });
+    });
+  }
+
+  void resetStopWatch() {
+    timer!.cancel();
+    setState(() {
+      started = false;
+      sec = 0;
+      min = 0;
+      hou = 0;
+
+      sSec = "00";
+      sMin = "00";
+      sHou = "00";
+    });
+  }
 
   List imageUrl = [
     "https://i.pinimg.com/564x/cc/7a/08/cc7a0805fd91dd8c5ad6457f861b7d66.jpg",
@@ -87,6 +138,20 @@ class _HomePageState extends State<HomePage> {
                   Switch(
                     value: _isDigital,
                     onChanged: (val) => _isDigital = !_isDigital,
+                  ),
+                ],
+              ),
+            ),
+            // StopWatch
+            Container(
+              margin: const EdgeInsets.all(5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Stop Watch"),
+                  Switch(
+                    value: _isStopwatch,
+                    onChanged: (val) => _isStopwatch = !_isStopwatch,
                   ),
                 ],
               ),
@@ -235,7 +300,33 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-            )
+            ),
+            Visibility(
+              visible: _isStopwatch,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "$sHou : $sMin : $sSec",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 56,
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      start();
+                    },
+                    child: Text(started ? "Started" : "Start"),
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        resetStopWatch();
+                      },
+                      child: const Text("reset"))
+                ],
+              ),
+            ),
           ],
         ),
       ),
